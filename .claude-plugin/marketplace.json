@@ -1,0 +1,5 @@
+{
+  "name": "agent-shell",
+  "owner": { "name": "poldap" },
+  "plugins": [{ "name": "agent-shell", "source": "./" }]
+}
