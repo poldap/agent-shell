@@ -162,11 +162,20 @@ export const register: Register = on => {
             </Box>
             {one.isOpen && (
               <Box backgroundColor="#111111" paddingX={1} marginTop={1} flexDirection="column">
-                <Box flexDirection="row" gap={1}>
-                  <Text color="green" bold>
-                    $
+                <Box flexDirection="row" justifyContent="space-between" gap={2}>
+                  <Text>
+                    <Text color="green" bold>
+                      ${' '}
+                    </Text>
+                    {one.command}
                   </Text>
-                  <Code source={one.command} language="bash" />
+                  <Button
+                    key={`copy-${one.id}`}
+                    plain
+                    dimColor
+                    label="copy"
+                    onPress={press => $.ui.copy({ text: one.command, surface: press.surface })}
+                  />
                 </Box>
                 {one.output !== '' && <Code source={one.output} />}
               </Box>
