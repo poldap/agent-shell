@@ -8,13 +8,6 @@ const entries = atom({ plugin: 'agent-shell', key: 'entries' } as const, [])
 
 const MAX_ENTRIES = 500
 
-// What a terminal shows before the output: the command after a prompt.
-const prompted = (command: string) =>
-  command
-    .split('\n')
-    .map((line, i) => (i === 0 ? `$ ${line}` : `> ${line}`))
-    .join('\n')
-
 // A title when the call gave no description: the first real command, minus leading VAR=value prefixes.
 const ASSIGNMENT = /^[A-Za-z_]\w*=("[^"]*"|'[^']*'|\S*)\s*(;|&&)?\s*/
 const titleOf = (command: string, description?: string) => {
@@ -169,7 +162,12 @@ export const register: Register = on => {
             </Box>
             {one.isOpen && (
               <Box backgroundColor="#111111" paddingX={1} marginTop={1} flexDirection="column">
-                <Code source={prompted(one.command)} language="bash" />
+                <Box flexDirection="row" gap={1}>
+                  <Text color="green" bold>
+                    $
+                  </Text>
+                  <Code source={one.command} language="bash" />
+                </Box>
                 {one.output !== '' && <Code source={one.output} />}
               </Box>
             )}

@@ -1,1 +1,1 @@
-{ "name": "agent-shell", "version": "0.1.0", "description": "A pane that replays every Bash command any agent runs, as a terminal session with the command and its output.", "types": "./types/index.d.ts" }
+{ "name": "agent-shell", "version": "0.1.1", "description": "A pane that replays every Bash command any agent runs, as a terminal session with the command and its output.", "types": "./types/index.d.ts" }
