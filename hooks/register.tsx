@@ -27,6 +27,46 @@ const shownTitle = (one: ShellEntry) =>
     ? one.title
     : titleOf(one.command)
 
+type Token = { text: string; color?: string; dim?: boolean }
+
+const COLORS = {
+  command: '#61afef',
+  flag: '#d19a66',
+  string: '#98c379',
+  variable: '#c678dd',
+  operator: '#56b6c2',
+  number: '#e5c07b',
+}
+
+// A small bash highlighter: commands, flags, strings, variables, operators, comments.
+const highlight = (source: string): Token[] => {
+  const tokens: Token[] = []
+  const re =
+    /(#.*)|('[^']*'|"(?:[^"\\]|\\.)*")|(\$\{[^}]*\}|\$\(|\$\w+|\$[?!@*#])|(\|\||&&|[|;&<>]+)|(\s+)|([^\s|;&<>'"$#]+)|[\s\S]/g
+  let isCommandNext = true
+  for (const m of source.matchAll(re)) {
+    const [text, comment, str, variable, operator, space, word] = m
+    if (comment) tokens.push({ text, dim: true })
+    else if (str) tokens.push({ text, color: COLORS.string })
+    else if (variable) tokens.push({ text, color: COLORS.variable })
+    else if (operator) {
+      tokens.push({ text, color: COLORS.operator })
+      isCommandNext = true
+    } else if (space) {
+      tokens.push({ text })
+      if (space.includes('\n')) isCommandNext = true
+    } else if (word) {
+      if (isCommandNext && !/^\w+=/.test(word)) {
+        tokens.push({ text, color: COLORS.command })
+        isCommandNext = false
+      } else if (word.startsWith('-') && word.length > 1) tokens.push({ text, color: COLORS.flag })
+      else if (/^\d+$/.test(word)) tokens.push({ text, color: COLORS.number })
+      else tokens.push({ text })
+    } else tokens.push({ text })
+  }
+  return tokens
+}
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
@@ -167,7 +207,11 @@ export const register: Register = on => {
                     <Text color="green" bold>
                       ${' '}
                     </Text>
-                    {one.command}
+                    {highlight(one.command).map(t => (
+                      <Text color={t.color} dimColor={t.dim}>
+                        {t.text}
+                      </Text>
+                    ))}
                   </Text>
                   <Button
                     key={`copy-${one.id}`}
